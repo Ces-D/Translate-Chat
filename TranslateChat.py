@@ -1,0 +1,44 @@
+"""
+Chat App that translates into the users chosen language. Every client chooses a language upon sign up and receives
+and writes chosen messages in chosen language regardless of others language options
+"""
+
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
+from flask import Flask, Blueprint, session, request, url_for, render_template
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
+
+if __name__ == '__main__':
+    debug = True
+    socketio.run(app)
+
+
+# Rooms
+# group users into subsets that can be addressed together
+# users receive messages from the room or rooms they are in, but not from other rooms where other users are
+@socketio.on('join')
+def on_join(data):
+    username = data['username']
+    room = data['room']
+    join_room(room)
+    send(username + ' has entered the room.', room=room)
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['username']
+    room = data['room']
+    leave_room(room)
+    send(username + ' has left the room.', room=room)
+
+# Receiving Messages
+# messages are received by both parties as events
+# the server needs to register handlers for these events, similarly to how routes are handled by view functions.
+@socketio.on('my event')
+# The message data for these events can be string, bytes, int, or JSON
+def handle_my_custom_event(json):
+    print('received json: ' + str(json))
+
+# Sending Messages
+

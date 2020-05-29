@@ -4,7 +4,8 @@ and writes chosen messages in chosen language regardless of others language opti
 """
 
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
-from flask import Flask, Blueprint, session, request, url_for, render_template
+from flask import Flask, Blueprint, session, request, url_for, render_template, redirect
+from wtfforms_fields import RegistrationForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -14,6 +15,15 @@ if __name__ == '__main__':
     debug = True
     socketio.run(app)
 
+@app.route("/", methods=['GET', 'POST'])
+def index():
+    return "Hello World"
+
+@app.route("/submit", methods=('GET', 'POST'))
+def submit():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        return redirect('/')
 
 # Rooms
 # group users into subsets that can be addressed together

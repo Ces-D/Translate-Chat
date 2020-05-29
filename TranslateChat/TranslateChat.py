@@ -3,17 +3,15 @@ Chat App that translates into the users chosen language. Every client chooses a 
 and writes chosen messages in chosen language regardless of others language options
 """
 
-from flask_socketio import SocketIO, send, emit, join_room, leave_room
-from flask import Flask, Blueprint, session, request, url_for, render_template, redirect
-from wtfforms_fields import RegistrationForm
+from flask_socketio import SocketIO, send, join_room, leave_room
+from flask import Flask, redirect
+from TranslateChat.wtfforms_fields import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
+# Initialize Flask-SocketIO
 socketio = SocketIO(app)
 
-if __name__ == '__main__':
-    debug = True
-    socketio.run(app)
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -51,4 +49,9 @@ def handle_my_custom_event(json):
     print('received json: ' + str(json))
 
 # Sending Messages
+@socketio.on('message')
+def message(data):
+    send(data)
 
+if __name__ == '__main__':
+    socketio.run(app, debug=True)

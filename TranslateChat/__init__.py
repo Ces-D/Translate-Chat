@@ -7,21 +7,23 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-import secrets
+from secrets import *
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = SECRET_KEY
+app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #silence deprecation warning
+
 
 # Initialize Flask-SocketIO
 socketio = SocketIO(app)
 
 # Initialize Login Manager
-login_manager = LoginManager()
-login_manager.init_app(app)
+login_manager = LoginManager(app)
 
 # Initialize DB
-db = SQLAlchemy()
+db = SQLAlchemy(app)
 
 
 from TranslateChat import routes

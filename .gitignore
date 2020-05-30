@@ -1,6 +1,7 @@
 __pycache__/
 flask_session/
 .idea/
-
+secrets.py
+*db
 
 

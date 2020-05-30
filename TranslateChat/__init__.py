@@ -7,6 +7,7 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+import secrets
 
 
 app = Flask(__name__)
@@ -19,7 +20,7 @@ socketio = SocketIO(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-#Initialize DB
+# Initialize DB
 db = SQLAlchemy()
 
 

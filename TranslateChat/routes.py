@@ -1,46 +1,44 @@
-"""
-Chat App that translates into the users chosen language. Every client chooses a language upon sign up and receives
-and writes chosen messages in chosen language regardless of others language options
-"""
-
-from flask_socketio import SocketIO, send, join_room, leave_room
-from flask import Flask, redirect, flash, url_for, render_template
-from TranslateChat.wtfforms_fields import RegistrationForm, LoginForm
-from flask_login import current_user, LoginManager
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-# Initialize Flask-SocketIO
-socketio = SocketIO(app)
-
-# Initialize Login Manager
-login_manager = LoginManager()
-login_manager.init_app(app)
+from flask_socketio import send, join_room, leave_room, emit
+from flask import redirect, flash, url_for, render_template
+from flask_login import current_user, login_user, logout_user
+from TranslateChat import app, socketio
+from TranslateChat.forms import RegistrationForm, LoginForm
+from TranslateChat.models import User
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=('GET', 'POST'))
 def index():
-    return "Hello World"
-
-
-@app.route("/submit", methods=('GET', 'POST'))
-def submit():
     form = RegistrationForm()
     if form.validate_on_submit():
-        return redirect('/')
+        return redirect('/chat')
+    return render_template('register.html')
 
-@app.route("/login", methods=['GET','POST'])
+
+@app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    # 
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        login_user(user)
+        flash('Log in Successful')
+        return redirect(url_for('chat'))
+    return redirect(url_for('index'))
+# TODO: create 'login.html'
 
+@app.route("/logout")
+def logout():
+    logout_user()
+    flash('Logout Succesful')
+    return redirect(url_for('login'))
+# TODO: Do we need logout.html
 
 @app.route("/chat", methods=['GET', 'POST'])
 def chat():
     if not current_user.is_authenticated:
         flash('Please login.', 'danger')
         return redirect(url_for('login'))
-
+    return render_template('chat.html')
+# TODO: create chat.html
 
 
 # Rooms
@@ -75,8 +73,8 @@ def handle_my_custom_event(json):
 @socketio.on('message')
 def message(data):
     send(data)
+    emit('some-event',"this is a custom event message")
 
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
-

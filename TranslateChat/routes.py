@@ -1,16 +1,23 @@
 from flask_socketio import send, join_room, leave_room, emit
 from flask import redirect, flash, url_for, render_template
 from flask_login import current_user, login_user, logout_user
-from TranslateChat import app, socketio
+from TranslateChat import app, socketio, db
 from TranslateChat.forms import RegistrationForm, LoginForm
 from TranslateChat.models import User
 
 
 @app.route("/", methods=('GET', 'POST'))
 def index():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        return redirect('/chat')
+    reg_form = RegistrationForm()
+    if reg_form.validate_on_submit():
+        username = reg_form.username.data
+        password = reg_form.password.data
+
+        # Add user to DB
+        user = User(username=username, password=password)
+        db.session.ad(user)
+        db.session.commit()
+        return "Inserted into DB"
     return render_template('register.html')
 
 
@@ -23,6 +30,8 @@ def login():
         flash('Log in Successful')
         return redirect(url_for('chat'))
     return redirect(url_for('index'))
+
+
 # TODO: create 'login.html'
 
 @app.route("/logout")
@@ -30,6 +39,8 @@ def logout():
     logout_user()
     flash('Logout Succesful')
     return redirect(url_for('login'))
+
+
 # TODO: Do we need logout.html
 
 @app.route("/chat", methods=['GET', 'POST'])
@@ -38,6 +49,8 @@ def chat():
         flash('Please login.', 'danger')
         return redirect(url_for('login'))
     return render_template('chat.html')
+
+
 # TODO: create chat.html
 
 
@@ -73,8 +86,4 @@ def handle_my_custom_event(json):
 @socketio.on('message')
 def message(data):
     send(data)
-    emit('some-event',"this is a custom event message")
-
-
-if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    emit('some-event', "this is a custom event message")

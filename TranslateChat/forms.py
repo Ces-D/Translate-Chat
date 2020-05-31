@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, EqualTo
+from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
+from TranslateChat.models import *
 
 
 class RegistrationForm(FlaskForm):
@@ -17,6 +18,12 @@ class RegistrationForm(FlaskForm):
                                   validators=[InputRequired(message="Passwords must match"),
                                               EqualTo('password', message="Passwords must match")])
     submit_button = SubmitField('Create')
+
+    def validate_username(self,username):
+        """Validator using SQL Database"""
+        user_object = User.query.filter_by(username=username.data).first()
+        if user_object:
+            raise ValidationError("Username already exists. Select diferent username")
 
 class LoginForm(FlaskForm):
     """Login Form"""

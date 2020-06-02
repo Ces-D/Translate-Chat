@@ -15,7 +15,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #silence deprecation warning
-conn = psycopg2.connect(f"dbname={DB_NAME} user={DB_USER}")
 
 
 # Initialize Flask-SocketIO

@@ -10,7 +10,6 @@ from flask_sqlalchemy import SQLAlchemy
 from secrets import *
 import psycopg2
 
-
 app = Flask(__name__)
 
 ENV = "dev"
@@ -23,18 +22,16 @@ else:
     app.debug = "False"
     app.config['SQLALCHEMY_DATABASE_URI'] = ''
 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # silence deprecation warning
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #silence deprecation warning
-
+# Initialize Login Manager
+login_manager = LoginManager(app)
+login_manager.init_app(app)
 
 # Initialize Flask-SocketIO
 socketio = SocketIO(app)
 
-# Initialize Login Manager
-login_manager = LoginManager(app)
-
-# Initialize DB
+# Create DB
 db = SQLAlchemy(app)
-
 
 from TranslateChat import routes

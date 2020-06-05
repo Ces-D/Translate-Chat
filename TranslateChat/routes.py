@@ -1,9 +1,15 @@
 from flask_socketio import send, join_room, leave_room, emit
 from flask import redirect, flash, url_for, render_template
 from flask_login import current_user, login_user, logout_user, login_required
-from TranslateChat import app, socketio
+
+from TranslateChat import app, socketio, login_manager
 from TranslateChat.forms import *
 from TranslateChat.models import *
+
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 @app.route("/", methods=('GET', 'POST'))
@@ -24,7 +30,7 @@ def index():
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template('register.html',form=reg_form)
+    return render_template("register.html", form=reg_form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -33,14 +39,16 @@ def login():
 
     # Allow login if validation success
     if login_form.validate_on_submit():
-        user = User.query.filter_by(username=login_form.username.data).first()
-        login_user(user)
-        flash('Log in Successful')
-        return redirect(url_for('chat'))
+        user_object = User.query.filter_by(username=login_form.username.data).first()
+        login_user(user_object)
+
+        # check if current user is authenticated
+        if current_user.is_authenticated:
+            flash('Log in Successful')
+            return redirect(url_for('chat'))
+
     return render_template("login.html", form=login_form)
 
-
-# TODO: create 'login.html'
 
 @app.route("/logout")
 @login_required
@@ -59,6 +67,8 @@ def chat():
         flash('Please login.', 'danger')
         return redirect(url_for('login'))
     return render_template('chat.html')
+
+
 # TODO: create chat.html
 
 

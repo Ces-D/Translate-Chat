@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
+from passlib.hash import pbkdf2_sha256
 from TranslateChat.models import *
 
 
@@ -29,7 +30,7 @@ class LoginForm(FlaskForm):
     """Login Form"""
     username = StringField('username_label',
                            validators=[InputRequired(message="Username Required")])
-    password = StringField('password_label',
+    password = PasswordField('password_label',
                            validators=[InputRequired(message="Password Required")])
     submit_button = SubmitField('Login')
 
@@ -37,5 +38,5 @@ class LoginForm(FlaskForm):
         user_object = User.query.filter_by(username=username.data).first()
         if user_object is None:
             raise ValidationError("Username or password is incorrect")
-        elif password != user_object.password:
+        elif not pbkdf2_sha256.verify(password,user_object.password):
             raise ValidationError("Username or password is incorrect")

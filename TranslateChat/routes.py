@@ -1,9 +1,9 @@
 from flask_socketio import send, join_room, leave_room, emit
 from flask import redirect, flash, url_for, render_template
 from flask_login import current_user, login_user, logout_user, login_required
-from TranslateChat import app, socketio, db
-from TranslateChat.forms import RegistrationForm, LoginForm
-from TranslateChat.models import User
+from TranslateChat import app, socketio
+from TranslateChat.forms import *
+from TranslateChat.models import *
 
 
 @app.route("/", methods=('GET', 'POST'))
@@ -14,8 +14,12 @@ def index():
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
+
+        # Hash password
+        hashed_password = pbkdf2_sha256.hash(password)
+
         # Add user to DB
-        user = User(username=username, password=password)
+        user = User(username=username, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))

@@ -31,3 +31,11 @@ class LoginForm(FlaskForm):
                            validators=[InputRequired(message="Username Required")])
     password = StringField('password_label',
                            validators=[InputRequired(message="Password Required")])
+    submit_button = SubmitField('Login')
+
+    def validate_credentials(self, username, password):
+        user_object = User.query.filter_by(username=username.data).first()
+        if user_object is None:
+            raise ValidationError("Username or password is incorrect")
+        elif password != user_object.password:
+            raise ValidationError("Username or password is incorrect")

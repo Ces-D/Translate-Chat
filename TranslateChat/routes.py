@@ -1,6 +1,6 @@
 from flask_socketio import send, join_room, leave_room, emit
 from flask import redirect, flash, url_for, render_template
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from TranslateChat import app, socketio, db
 from TranslateChat.forms import RegistrationForm, LoginForm
 from TranslateChat.models import User
@@ -15,10 +15,11 @@ def index():
 
         # Add user to DB
         user = User(username=username, password=password)
-        db.session.ad(user)
+        db.session.add(user)
         db.session.commit()
         return "Inserted into DB"
-    return render_template('register.html')
+
+    return render_template('register.html',form=reg_form)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -35,6 +36,7 @@ def login():
 # TODO: create 'login.html'
 
 @app.route("/logout")
+@login_required
 def logout():
     logout_user()
     flash('Logout Succesful')
@@ -44,13 +46,12 @@ def logout():
 # TODO: Do we need logout.html
 
 @app.route("/chat", methods=['GET', 'POST'])
+@login_required
 def chat():
     if not current_user.is_authenticated:
         flash('Please login.', 'danger')
         return redirect(url_for('login'))
     return render_template('chat.html')
-
-
 # TODO: create chat.html
 
 

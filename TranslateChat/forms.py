@@ -23,7 +23,7 @@ class RegistrationForm(FlaskForm):
         """Validator using SQL Database"""
         user_object = User.query.filter_by(username=username.data).first()
         if user_object:
-            raise ValidationError("Username already exists. Select diferent username")
+            raise ValidationError("Username already exists. Select different username")
 
 class LoginForm(FlaskForm):
     """Login Form"""

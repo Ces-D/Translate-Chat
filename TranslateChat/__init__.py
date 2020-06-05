@@ -12,8 +12,18 @@ import psycopg2
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
+
+ENV = "dev"
+
+if ENV == "dev":
+    app.debug = "True"
+    app.config['SECRET_KEY'] = SECRET_KEY
+    app.config['SQLALCHEMY_DATABASE_URI'] = LOCAL_DB_URL
+else:
+    app.debug = "False"
+    app.config['SQLALCHEMY_DATABASE_URI'] = ''
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #silence deprecation warning
 
 

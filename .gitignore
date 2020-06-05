@@ -3,5 +3,5 @@ flask_session/
 .idea/
 secrets.py
 *db
-
+.env
 

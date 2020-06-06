@@ -1,4 +1,4 @@
-from TranslateChat import app
+from TranslateChat import app, socketio
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)

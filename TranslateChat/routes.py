@@ -39,8 +39,11 @@ def login():
     # Allow login if validation success
     if login_form.validate_on_submit():
         user_object = User.query.filter_by(username=login_form.username.data).first()
+        if user_object is None:
+            return ("Login was not correct and you will need to fix this")
         login_user(user_object)
         return redirect(url_for('chat'))
+        # TODO: Figure out what to do if login credentials not real
 
     return render_template("login.html", form=login_form)
 
@@ -51,16 +54,11 @@ def logout():
     logout_user()
     flash('Logout Successful')
     return redirect(url_for('login'))
-
 # TODO: create logout button
-# TODO: Do we need logout.html
 
 @app.route("/chat", methods=['GET', 'POST'])
 @login_required
 def chat():
-    if not current_user.is_authenticated:
-        flash('Please login.', 'danger')
-        return redirect(url_for('login'))
     return render_template('chat.html')
 
 
@@ -83,6 +81,12 @@ def on_leave(data):
     send(username + ' has left the room.', room=room)
 
 
+# Sending Messages
+@socketio.on('message')
+def message(data):
+    send(data)
+
+
 # Receiving Messages
 # messages are received by both parties as events
 # the server needs to register handlers for these events, similarly to how routes are handled by view functions.
@@ -90,10 +94,6 @@ def on_leave(data):
 # The message data for these events can be string, bytes, int, or JSON
 def handle_my_custom_event(json):
     print('received json: ' + str(json))
-
-
-# Sending Messages
-@socketio.on('message')
-def message(data):
-    send(data)
-    emit('some-event', "this is a custom event message")
+    pass
+    # TODO: Finish message receiving
+    # TODO: Finish client side

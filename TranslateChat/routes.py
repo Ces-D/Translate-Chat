@@ -25,7 +25,7 @@ def register():
         hashed_password = pbkdf2_sha256.hash(password)
 
         # Add username and password to DB
-        user = User(username=username, hashed_password=hashed_password)
+        user = User(username=username, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -52,7 +52,7 @@ def logout():
     flash('Logout Successful')
     return redirect(url_for('login'))
 
-
+# TODO: create logout button
 # TODO: Do we need logout.html
 
 @app.route("/chat", methods=['GET', 'POST'])

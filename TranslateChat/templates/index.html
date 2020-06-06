@@ -8,17 +8,31 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>{% block title %}{% end block title%}</title>
 </head>
+
 <body>
-{% with messages = get_flashed_messages() %}
+
+<!-- Main Section start -->
+<div class="main-seciton">
+
+
+    <!-- flash error messages start -->
+    {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul class="flashes">
         {% for message in messages %}
-            <li>{{ message }}</li>
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
-{% endwith %}
-# TODO: Figure out what is going on with messages
-{% block content %}{% endblock content %}
+    {% endwith %}
+    <!--flash error messages end -->
+
+    {% block content %}{% endblock content %}
+
+
+</div>
+<!-- Main Section end -->
+
+
 </body>
 </html>

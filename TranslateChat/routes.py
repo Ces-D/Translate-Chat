@@ -4,7 +4,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from TranslateChat import app, socketio, login_manager
 from TranslateChat.forms import *
-from TranslateChat.models import *
+from TranslateChat.models import User
 
 
 @login_manager.user_loader
@@ -13,7 +13,7 @@ def load_user(id):
 
 
 @app.route("/", methods=('GET', 'POST'))
-def index():
+def register():
     reg_form = RegistrationForm()
 
     # Update database if validation is successful
@@ -24,12 +24,11 @@ def index():
         # Hash password
         hashed_password = pbkdf2_sha256.hash(password)
 
-        # Add user to DB
-        user = User(username=username, password=hashed_password)
+        # Add username and password to DB
+        user = User(username=username, hashed_password=hashed_password)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
-
     return render_template("register.html", form=reg_form)
 
 
@@ -41,11 +40,7 @@ def login():
     if login_form.validate_on_submit():
         user_object = User.query.filter_by(username=login_form.username.data).first()
         login_user(user_object)
-
-        # check if current user is authenticated
-        if current_user.is_authenticated:
-            flash('Log in Successful')
-            return redirect(url_for('chat'))
+        return redirect(url_for('chat'))
 
     return render_template("login.html", form=login_form)
 
@@ -54,7 +49,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('Logout Succesful')
+    flash('Logout Successful')
     return redirect(url_for('login'))
 
 
@@ -67,9 +62,6 @@ def chat():
         flash('Please login.', 'danger')
         return redirect(url_for('login'))
     return render_template('chat.html')
-
-
-# TODO: create chat.html
 
 
 # Rooms

@@ -69,16 +69,28 @@ def chat():
     return render_template('chat.html', username=current_user.username, rooms=ROOMS)
 
 
-# Rooms
-# group users into subsets that can be addressed together
-# users receive messages from the room or rooms they are in, but not from other rooms where other users are
+# Sockets Features
+
+
+# Sending Messages
+@socketio.on('incoming_message', namespace="/chat")
+def incoming_message(data):
+    """
+    Broadcast Messages to users
+    """
+    msg = data["msg"]
+    username = data["username"]
+    room = data["room"]
+    # TODO: Consider adding timestamp
+    send({"username": username, "msg": msg}, room=room)
+
 @socketio.on('join')
 def on_join(data):
     username = data['username']
     room = data['room']
     join_room(room)
     send(username + ' has entered the room.', room=room)
-
+    # TODO: Consider removing text upon room entrance
 
 @socketio.on('leave')
 def on_leave(data):
@@ -86,21 +98,6 @@ def on_leave(data):
     room = data['room']
     leave_room(room)
     send(username + ' has left the room.', room=room)
+    # TODO: Consider removing text upon room entrance
 
-
-# Sending Messages
-@socketio.on('message')
-def message(data):
-    send(data)
-
-
-# Receiving Messages
-# messages are received by both parties as events
-# the server needs to register handlers for these events, similarly to how routes are handled by view functions.
-@socketio.on('my event')
-# The message data for these events can be string, bytes, int, or JSON
-def handle_my_custom_event(json):
-    print('received json: ' + str(json))
-    pass
-    # TODO: Finish message receiving
     # TODO: Finish client side

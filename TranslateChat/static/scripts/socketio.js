@@ -4,7 +4,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // Connect to web socket
-     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + "/chat");
 
     // Get username
     const username = document.querySelector('#get-username').innerHTML;
@@ -23,13 +23,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Display all Incoming Messages
     socket.on('message', data => {
-           // Display current message
+
+           // Display current user message
            if (data.msg) {
                 const p = document.createElement('p');
                 const span_username = document.createElement('span');
-                const span_timestamp = document.createElement('span');
                 const br = document.createElement('br')
-        }})
-    }
+                 // Display user's own message
+                if (data.username == username) {
+                    p.setAttribute("class", "my-msg");
 
+                    // Username
+                    span_username.setAttribute("class", "my-username");
+                    span_username.innerText = data.username;
+
+                    // HTML to append
+                    p.innerHTML += span_username.outerHTML + br.outerHTML + data.msg + br.outerHTML
+
+                    //Append
+                    document.querySelector('#display-message-section').append(p);
+                }
+           }
+    })
 

@@ -40,3 +40,4 @@ class LoginForm(FlaskForm):
             raise ValidationError("Username or password is incorrect")
         elif not pbkdf2_sha256.verify(password,user_object.password):
             raise ValidationError("Username or password is incorrect")
+

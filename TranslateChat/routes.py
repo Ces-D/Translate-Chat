@@ -1,5 +1,5 @@
 from flask_socketio import send, join_room, leave_room, emit
-from flask import redirect, flash, url_for, render_template
+from flask import redirect, flash, url_for, render_template, sessions
 from flask_login import current_user, login_user, logout_user, login_required
 
 from TranslateChat import app, socketio, login_manager
@@ -10,6 +10,11 @@ from TranslateChat.models import User
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+# Predefined rooms
+# TODO: Make this feature more dynamic
+ROOMS = ["Lounge", "Memes"]
 
 
 @app.route("/", methods=('GET', 'POST'))
@@ -54,12 +59,14 @@ def logout():
     logout_user()
     flash('Logout Successful')
     return redirect(url_for('login'))
+
+
 # TODO: create logout button
 
 @app.route("/chat", methods=['GET', 'POST'])
 @login_required
 def chat():
-    return render_template('chat.html')
+    return render_template('chat.html', username=current_user.username, rooms=ROOMS)
 
 
 # Rooms

@@ -8,29 +8,80 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Welcome</title>
 </head>
+
 <body>
-<!-- Navigation Bar -->
-<nav>
+<!-- Flash error messages -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<p class=formError>{{ messages[0] }}</p>
+{% endif %}
+{% endwith %}
 
-</nav>
-<div id="main-section">
-    <!-- Room Selection -->
-    <nav id="sidebar">
+<div class="wrapper">
 
+    <!-- Navigation Bar start -->
+    <nav class="navbar navbar-expand-sm navbar-light fixed-top" style="background-color: #0066cc">
+        <div class="container-fluid">
+            <div id="show-sidebar-button" class="cursor-pointer">
+                <i class="fas fa-plus-circle "></i>
+                <span>Rooms</span>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a id="logout-btn" class="nav-link" href="{{ url_for('logout') }}"><span style="color: #335177">Logout</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </nav>
-    <!-- Message Area -->
-    <div id="rightside-pannel">
-        <!-- Display Message -->
-        <div id="display-message-section">
+    <!-- Navigation Bar end -->
 
+    <!-- Main Section start -->
+    <div id="main-section">
+
+        <!-- Sidebar start -->
+        <nav id="sidebar">
+            <h4>Rooms</h4>
+            {% for room in rooms %}
+            <p id="{{ room|title }}" class="select-room cursor-pointer">{{ room|title }}</p>
+            {% endfor %}
+        </nav>
+        <!-- Right side panel start -->
+        <div id="rightside-panel">
+
+            <!-- Display message start-->
+            <div id="display-message-section">
+            </div>
+            <!-- Display message end -->
+
+            <!-- Type message start -->
+            <div id="input-area" class="input-group mb-3">
+                <input type="text" id="user_message" class="form-control" placeholder="Type here..."
+                       aria-label="Type a message" aria-describedby="basic-addon2" autocomplete="off">
+                <div class="input-group-append">
+                    <button id="send_message" class="btn btn-warning" type="button">SEND <i
+                            class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Type message end -->
         </div>
-        <!-- Input Message -->
-        <div id="input-area">
-            <input type="text" id="user_message" placeholder="Type here..." autocomplete="off">
-            <button type="button" id="send_message">SEND</button>
-        </div>
+        <!-- Right side panel end -->
     </div>
+    <!-- Main section end -->
 </div>
+<!-- Wrapper end -->
+
+<!-- Get Username -->
+<span id="get-username">{{ username }}</span>
+
 <!-- SocketIO JS -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
         integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
@@ -38,4 +89,5 @@
 <!-- Custom SocketIO JS -->
 <script src="{{ url_for('static', filename='scripts/socketio.js') }}"></script>
 </body>
+
 </html>

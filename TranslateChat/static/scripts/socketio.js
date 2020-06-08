@@ -40,9 +40,69 @@ document.addEventListener('DOMContentLoaded', () => {
                     // HTML to append
                     p.innerHTML += span_username.outerHTML + br.outerHTML + data.msg + br.outerHTML
 
-                    //Append
+                    // Append
                     document.querySelector('#display-message-section').append(p);
                 }
+
+               // Display other user's Messages
+               else if (typeof data.username!== 'undefined'){
+                    p.setAttribute("class", "other-msg");
+
+                    // Username
+                    span_username.setAttribute("class", "other-username");
+                    span_username.innerText = data.username;
+
+                    // HTML to append
+                    p.innerHTML += span_username.outerHTML + br.outerHTML + data.msg + br.outerHTML
+
+                    // Append
+                    document.querySelector('#display-message-section').append(p);
+               }
+
            }
-    })
+           scrollDownChatWindow();
+    });
+
+    // Select a room
+    document.querySelectorAll('.select-room').forEach(p => {
+        p.onclick = () => {
+            let newRoom = p.innerHTML
+
+            // Check if user already in the room
+            if (newRoom === room) {
+                msg = `You are already in ${room} room.`;
+                printSysMsg(msg);
+
+                // else put user in the newRoom
+            } else {
+                leaveRoom(room);
+                joinRoom(newRoom);
+                room = newRoom;
+            }
+        };
+    });
+
+    // Leave room
+    function leaveRoom(room) {
+        socket.emit('leave', {'username': username, 'room':room});
+    }
+
+    //Join room
+    function joinRoom(room){
+        socket.emit('join', {'username':username, 'room':room});
+
+        // Clear message area
+        document.querySelector('#display-message-section').innerHTML = '';
+
+        // Autofocus on text box
+        document.querySelector('#user_message').focus();
+    }
+
+    // Scroll chat window down
+    function scrollDownChatWindow(){
+        const chatWindow = document.querySelector('#display-message-section');
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+}
 

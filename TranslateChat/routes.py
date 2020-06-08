@@ -84,7 +84,7 @@ def incoming_message(data):
     # TODO: Consider adding timestamp
     send({"username": username, "msg": msg}, room=room)
 
-@socketio.on('join')
+@socketio.on('join', namespace= "/chat")
 def on_join(data):
     username = data['username']
     room = data['room']
@@ -92,7 +92,7 @@ def on_join(data):
     send(username + ' has entered the room.', room=room)
     # TODO: Consider removing text upon room entrance
 
-@socketio.on('leave')
+@socketio.on('leave', namespace= "/chat")
 def on_leave(data):
     username = data['username']
     room = data['room']

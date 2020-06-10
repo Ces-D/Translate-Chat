@@ -18,6 +18,7 @@ if ENV == "dev":
     app.debug = "True"
     app.config['SECRET_KEY'] = SECRET_KEY
     app.config['SQLALCHEMY_DATABASE_URI'] = LOCAL_DB_URL
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 else:
     app.debug = "False"
     app.config['SQLALCHEMY_DATABASE_URI'] = ''

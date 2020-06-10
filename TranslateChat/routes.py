@@ -1,6 +1,7 @@
 from flask_socketio import send, join_room, leave_room, emit
 from flask import redirect, flash, url_for, render_template, sessions
 from flask_login import current_user, login_user, logout_user, login_required
+import time
 
 from TranslateChat import app, socketio, login_manager
 from TranslateChat.forms import *
@@ -72,32 +73,35 @@ def chat():
 # Sockets Features
 
 
-# Sending Messages
-@socketio.on('incoming_message', namespace="/chat")
-def incoming_message(data):
-    """
-    Broadcast Messages to users
-    """
+@socketio.on('incoming-msg')
+def on_message(data):
+    """Broadcast messages"""
+
     msg = data["msg"]
     username = data["username"]
     room = data["room"]
-    # TODO: Consider adding timestamp
-    send({"username": username, "msg": msg}, room=room)
+    # Set timestamp
+    time_stamp = time.strftime('%b-%d %I:%M%p', time.localtime())
+    send({"username": username, "msg": msg, "time_stamp": time_stamp}, room=room)
 
-@socketio.on('join', namespace= "/chat")
+
+@socketio.on('join')
 def on_join(data):
-    username = data['username']
-    room = data['room']
-    join_room(room)
-    send(username + ' has entered the room.', room=room)
-    # TODO: Consider removing text upon room entrance
+    """User joins a room"""
 
-@socketio.on('leave', namespace= "/chat")
+    username = data["username"]
+    room = data["room"]
+    join_room(room)
+
+    # Broadcast that new user has joined
+    send({"msg": username + " has joined " + room + "."}, room=room)
+
+
+@socketio.on('leave')
 def on_leave(data):
+    """User leaves a room"""
+
     username = data['username']
     room = data['room']
     leave_room(room)
-    send(username + ' has left the room.', room=room)
-    # TODO: Consider removing text upon room entrance
-
-    # TODO: Finish client side
+    send({"msg": username + " has left " + room}, room=room)
